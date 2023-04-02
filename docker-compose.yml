@@ -32,7 +32,6 @@ services:
     restart: unless-stopped
     volumes:
       - node_modules:/usr/src/app/node_modules
-      - prisma:/usr/src/app/prisma
     networks:
       - bot-network
     command: npm start
@@ -44,7 +43,6 @@ volumes:
   pgdata:
   redisdata:
   node_modules:
-  prisma:
 
 networks:
   bot-network:
