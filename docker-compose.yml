@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PW}
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - bot-network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    volumes:
+      - redisdata:/data
+    networks:
+      - bot-network
+    environment:
+      REDIS_ARGS: --save 20 1
+
+  app:
+    build:
+      dockerfile: ./docker/app.dockerfile
+    restart: unless-stopped
+    volumes:
+      - node_modules:/usr/src/app/node_modules
+      - prisma:/usr/src/app/prisma
+    networks:
+      - bot-network
+    command: npm start
+    depends_on:
+      - redis
+      - postgres
+
+volumes:
+  pgdata:
+  redisdata:
+  node_modules:
+  prisma:
+
+networks:
+  bot-network:

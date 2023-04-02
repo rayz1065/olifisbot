@@ -1,0 +1,113 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               Int            @id @default(autoincrement())
+  telegram_chat_id Int            @unique
+  first_name       String
+  last_name        String?
+  username         String?
+  created_at       DateTime       @default(now())
+  user_questions   UserQuestion[]
+  language         String?
+  invited_by_id    Int?
+  invited_by       User?          @relation("invites", fields: [invited_by_id], references: [id])
+  invited_users    User[]         @relation("invites")
+}
+
+model EditionType {
+  id         Int       @id @default(autoincrement())
+  code       String    @unique
+  editions   Edition[]
+  created_at DateTime  @default(now())
+  name       String    @default("")
+}
+
+model Edition {
+  id               Int              @id @default(autoincrement())
+  year             Int
+  competition_date DateTime
+  archive_url      String?
+  text_file_id     String?
+  solution_file_id String?
+  type_id          Int
+  type             EditionType      @relation(fields: [type_id], references: [id])
+  created_at       DateTime         @default(now())
+  questions_groups QuestionsGroup[]
+
+  @@unique([type_id, year])
+}
+
+model QuestionsGroup {
+  id         Int        @id @default(autoincrement())
+  edition_id Int
+  edition    Edition    @relation(fields: [edition_id], references: [id], onDelete: Cascade)
+  title      String
+  code       String     @default("default")
+  created_at DateTime   @default(now())
+  questions  Question[]
+
+  @@unique([edition_id, code])
+}
+
+model Question {
+  id                 Int                   @id @default(autoincrement())
+  questions_group_id Int
+  questions_group    QuestionsGroup        @relation(fields: [questions_group_id], references: [id], onDelete: Cascade)
+  user_questions     UserQuestion[]
+  question_tags      QuestionQuestionTag[]
+  number             Int
+  question_image     String?
+  solution_image     String?
+  answer_type        String
+  closed_answer      String?
+  answer_hint        String?
+  open_answer        Float?
+  open_answer_range  Float?
+  open_answer_unit   String?
+  answer_formula     String?
+  created_at         DateTime              @default(now())
+
+  @@unique([questions_group_id, number])
+}
+
+model QuestionQuestionTag {
+  question_id     Int
+  question        Question    @relation(fields: [question_id], references: [id], onDelete: Cascade)
+  question_tag_id Int
+  question_tag    QuestionTag @relation(fields: [question_tag_id], references: [id], onDelete: Cascade)
+
+  @@id([question_id, question_tag_id])
+}
+
+model QuestionTag {
+  id            Int                   @id @default(autoincrement())
+  name          String
+  code          String                @unique()
+  icon          String?
+  question_tags QuestionQuestionTag[]
+}
+
+model UserQuestion {
+  question_id  Int
+  question     Question @relation(fields: [question_id], references: [id])
+  user_id      Int
+  user         User     @relation(fields: [user_id], references: [id])
+  attempts     Int      @default(0)
+  solved       Boolean  @default(false)
+  saw_solution Boolean  @default(false)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@id([user_id, question_id])
+}
