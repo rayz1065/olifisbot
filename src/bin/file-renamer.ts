@@ -73,7 +73,9 @@ async function renameFiles() {
   );
   const dirs = await fs.promises.readdir(oldQuestionsDir);
   for (const dir of dirs) {
-    await renameYear(dir, path.join(oldQuestionsDir, dir));
+    if (fs.lstatSync(path.join(oldQuestionsDir, dir)).isDirectory()) {
+      await renameYear(dir, path.join(oldQuestionsDir, dir));
+    }
   }
   console.log('done');
 }
