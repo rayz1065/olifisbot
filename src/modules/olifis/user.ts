@@ -445,7 +445,7 @@ export const userQuestionsList = new TgCallback<[page?: number]>(
 );
 
 const botInfo = new TgCallback('info', async (ctx) => {
-  const text = `${emoji.book} ${ctx.t('bot-info-msg')}`;
+  const text = ctx.t('bot-info-msg');
   const keyboard = [
     [botStats.getBtn(`${ctx.t('stats')} ${emoji.bar_chart}`)],
     [mainMenu.getBtn(ctx.t('back'))],

@@ -1,6 +1,9 @@
 -bot-name = oliΦsbot
 -bot-creator = @rayz1065
 -problems-website = olifis.it
+-teams-problems-website = gas.olifis.it
+-problems-license-website = https://creativecommons.org/licenses/by-nc/2.0/
+-bot-github = https://github.com/rayz1065/olifisbot/
 
 cancel = Cancel {$emoji-cancel}
 back = Back {$emoji-back}
@@ -132,7 +135,15 @@ formatted-date-short = {DATETIME($date, month: "short", year: "numeric", day: "n
 formatted-date-long = {DATETIME($date, month: "long", year: "numeric", day: "numeric", weekday: "long")}
 
 bot-info-msg =
-    This bot was created by {-bot-creator}, all problems can be found online on the website {-problems-website}
+    📖 <b>Information about {-bot-name}</b>
+    👨‍💻 This bot was created by {-bot-creator}.
+
+    🔗 Problems from <i>physics Olympiads</i> can be found online on the website {-problems-website}.
+    🧲 Problems of the <i>teams championship</i> can be found on {-teams-problems-website}.
+
+    📃 All problems are available under the <b>license</b> CC BY-NC, download a copy of it on {-problems-license-website}.
+
+    📦 The <b>source code</b> of {-bot-name} is on GitHub at {-bot-github}.
 
 welcome-msg =
     Welcome {$user-name} on <b>{-bot-name}</b>, unofficial bot to train for the physics Olympiads!
