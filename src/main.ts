@@ -66,6 +66,7 @@ const i18n = new I18n<MyContext>({
 export const prisma = new PrismaClient();
 export const redis = new IORedis({
   host: 'redis',
+  password: process.env.REDIS_PASSWORD,
 });
 export const bot = new Bot<MyContext>(process.env.BOT_TOKEN);
 bot.use(sequentialize());
