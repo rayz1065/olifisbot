@@ -60,9 +60,16 @@ olifis-config-create-question = Crea domanda
 olifis-config-questions-group-not-found = Gruppo di domande non trovato
 olifis-config-change-group-title = Cambia titolo del gruppo di domande
 olifis-config-open-answer = Risposta aperta
-olifis-config-choose-answer-or-type = Scegli una delle risposte o invia una risposta aperta nel formato &lt;valore-minimo&gt; &lt;valore-massimo&gt; &lt;unità&gt; e.g.: "9.6 10 m/s^2", "1.1 1.3 km^2". Invia una riga che inizia con '=' se le soluzione è una formula, e.g. "= G*M*m / (r^2)"
+olifis-config-choose-answer-or-type =
+    Scegli una delle risposte o invia una risposta aperta in uno dei seguenti formati:
+    ➡️ &lt;min&gt; &lt;max&gt; [&lt;unità&gt], e.g.: "9.6 10 m/s^2", "99 101"
+    ➡️ &lt;valore&gt; &lt;errore&gt% [&lt;unità&gt;], "50 1% km^2", "1000 5%".
+
+    Invia una riga che inizia con '<code>=</code>' se le soluzione è una formula, e.g. "= G*M*m / (r^2)"
+# Invia una riga che inizia con '<code>?</code>' se la soluzione è da scegliere tra delle opzioni, e.g. "?Stabile,Instabile" o "? α &lt; 0, α ≥ 0"
 olifis-config-question-created = La domanda è stata creata
 
+adimensional = Adimensionale
 invalid-answer = Questa risposta non è valida
 invalid-open-answer-format = Formato non valido, indica due numeri e un'unità di misura
 invalid-error = Errore inserito non valido

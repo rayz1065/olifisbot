@@ -60,10 +60,17 @@ olifis-config-create-question = Create question
 olifis-config-questions-group-not-found = Questions group not found
 olifis-config-change-group-title = Change group title
 olifis-config-open-answer = Open answer
-olifis-config-choose-answer-or-type = Choose one of the answers or specify a different type
+olifis-config-choose-answer-or-type =
+    Choose one of the answers or write an open question in one of the following formats:
+    ➡️ &lt;min&gt; &lt;max&gt; [&lt;unit&gt], e.g.: "9.6 10 m/s^2", "99 101"
+    ➡️ &lt;value&gt; &lt;error&gt% [&lt;unit&gt;], "50 1% km^2", "1000 5%".
+
+    Send a line that starts with '<code>=</code>' if the solution is a formula, e.g. "= G*M*m / (r^2)"
+# Send a line that starts with '<code>?</code>' if the solution must be chosen from some alternatives, e.g. "?Stable,Unstable" o "? α &lt; 0, α ≥ 0"
 olifis-config-question-created = The question was created
 
-invalid-answer = QThis answer is not valid
+adimensional = Adimensional
+invalid-answer = This answer is not valid
 invalid-open-answer-format = Format not valid, please two numbers and a unit
 invalid-error = Indicated error not valid
 with-variables = with variables

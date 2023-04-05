@@ -59,9 +59,9 @@ function createQuestionMsg(
   } else if (questionData.answer_type === QUESTION_TYPES.open) {
     const ansMin = questionData.open_answer! - questionData.open_answer_range!;
     const ansMax = questionData.open_answer! + questionData.open_answer_range!;
-    const ansUnit = questionData.open_answer_unit;
-    answerTxt = `${ansMin.toPrecision(3)} &lt;= x &lt;= ${ansMax.toPrecision(
-      3
+    const ansUnit = questionData.open_answer_unit ?? ctx.t('adimensional');
+    answerTxt = `${ansMin.toPrecision(6)} ≤ x ≤ ${ansMax.toPrecision(
+      6
     )} [${ansUnit}]`;
   } else if (questionData.answer_type === QUESTION_TYPES.formula) {
     const formula = questionData.answer_formula!;
@@ -132,7 +132,7 @@ async function answerInput(
       answer_type: typeof QUESTION_TYPES.open;
       open_answer: number;
       open_answer_range: number;
-      open_answer_unit: string;
+      open_answer_unit: string | null;
     }
   | {
       answer_type: typeof QUESTION_TYPES.formula;
@@ -196,9 +196,25 @@ async function answerInput(
     };
   }
 
-  const match = /^(\d+(?:\.\d*)?)\s*(\d+(?:\.\d*)?)\s*([^\s]+)$/.exec(
-    message.text
-  );
+  const numberRe = /\d+(?:\.\d*)?/.source;
+  const unitRe = /[^\s]+/.source;
+  const errorRe = /\d+(?:\.\d*)?%/.source;
+  const formats: RegExp[] = [
+    // capture groups are (from) (to) (error) (unit)
+    new RegExp(`^(${numberRe})()()()$`),
+    new RegExp(`^(${numberRe})\\s+(${numberRe})()()$`),
+    new RegExp(`^(${numberRe})()\\s+(${errorRe})()$`),
+    new RegExp(`^(${numberRe})()\\s+(${errorRe})\\s+(${unitRe})$`),
+    new RegExp(`^(${numberRe})\\s+(${numberRe})()\\s+(${unitRe})$`),
+    new RegExp(`^(${numberRe})()()\\s+(${unitRe})$`),
+  ];
+  let match: RegExpMatchArray | null = null;
+  for (const regex of formats) {
+    match = regex.exec(message.text);
+    if (match) {
+      break;
+    }
+  }
   await tgValidate(
     conversation,
     ctx,
@@ -214,15 +230,25 @@ async function answerInput(
     { baseText: text, keyboard }
   );
   assert(match);
-  const ansMin = parseFloat(match[1]);
-  const ansMax = parseFloat(match[2]);
+  let ansMin = parseFloat(match[1]);
+  let ansMax = match[2] !== '' ? parseFloat(match[2]) : null;
+  const ansErr =
+    match[3] !== '' ? parseFloat(match[3].split('%')[0]) / 100 : 0.1 / 100;
+  const ansUnit = match[4] !== '' ? match[4] : null;
+
+  if (ansMax === null) {
+    // use error to compute min and max
+    const ansMemo = ansMin;
+    ansMin = ansMemo - ansMemo * ansErr;
+    ansMax = ansMemo + ansMemo * ansErr;
+  }
+
   const openAnswer = (ansMin + ansMax) / 2;
-  const openAnswerUnit = match[3];
   const openAnswerRange = openAnswer - ansMin;
   return {
     answer_type: 'open',
     open_answer: openAnswer,
-    open_answer_unit: openAnswerUnit,
+    open_answer_unit: ansUnit,
     open_answer_range: openAnswerRange,
   };
 }

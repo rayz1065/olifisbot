@@ -172,7 +172,7 @@ export const enterQuestionById = new TgCallback<
   await enterQuestion(ctx, question, source);
 });
 
-function prettyPrintAnswer(question: QuestionFull) {
+function prettyPrintAnswer(ctx: MyContext, question: QuestionFull) {
   if (question.answer_type === QUESTION_TYPES.closed) {
     return `${question.closed_answer}`;
   } else if (question.answer_type === QUESTION_TYPES.formula) {
@@ -182,7 +182,7 @@ function prettyPrintAnswer(question: QuestionFull) {
     const openAnswerRange = question.open_answer_range ?? 0;
     return `${+openAnswer.toPrecision(5)} ± ${+openAnswerRange.toPrecision(
       5
-    )} [${question.open_answer_unit}]`;
+    )} [${question.open_answer_unit ?? ctx.t('adimensional')}]`;
   }
   return '?';
 }
@@ -214,7 +214,7 @@ const showSolution = new TgCallback<[questionId: number]>(
     try {
       await ctx.replyWithPhoto(getQuestionSolutionImage(question), {
         caption: `<b>${ctx.t('the-solution-is', {
-          answer: prettyPrintAnswer(question),
+          answer: prettyPrintAnswer(ctx, question),
         })}</b>`,
         ...ik([[hideSolution.getBtn(`${ctx.t('hide-solution')} ${emoji.x}`)]]),
       });
@@ -279,7 +279,7 @@ const closedAnswer = new TgCallback<
 
   const textLines = [
     `<b>${ctx.t('the-solution-is', {
-      answer: prettyPrintAnswer(question),
+      answer: prettyPrintAnswer(ctx, question),
     })}</b>`,
     `${emoji.trophy} ` +
       ctx.t('you-solved-in-attempts', { attempts: userQuestion.attempts }),
@@ -316,7 +316,7 @@ async function olifisOpenAnswer(conversation: MyConversation, ctx: MyContext) {
   let explanation = '?';
   if (question.answer_type === QUESTION_TYPES.open) {
     explanation = ctx.t('attempt-answer-open-explanation', {
-      unit: question.open_answer_unit!,
+      unit: question.open_answer_unit ?? ctx.t('adimensional'),
     });
   } else {
     const expression = Parser.parse(question.answer_formula!);
@@ -389,7 +389,7 @@ async function olifisOpenAnswer(conversation: MyConversation, ctx: MyContext) {
 
   const textLines = [
     `<b>${ctx.t('the-solution-is', {
-      answer: prettyPrintAnswer(question),
+      answer: prettyPrintAnswer(ctx, question),
     })}</b>`,
     `${emoji.trophy} ` +
       ctx.t('you-solved-in-attempts', { attempts: userQuestion.attempts }),

@@ -13,6 +13,8 @@ export const EDITION_TYPES = {
   firstLevel: 'first-level',
   secondLevel: 'second-level',
   nationals: 'nationals',
+  teamsQualifiers: 'teams-qualifiers',
+  teamsNationals: 'teams-nationals',
 } as const;
 export const QUESTION_TYPES = {
   closed: 'closed',
