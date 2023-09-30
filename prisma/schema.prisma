@@ -10,18 +10,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Session {
+  id    BigInt @id @default(autoincrement())
+  key   String @unique
+  value String
+}
+
 model User {
-  id               Int            @id @default(autoincrement())
-  telegram_chat_id Int            @unique
-  first_name       String
-  last_name        String?
-  username         String?
-  created_at       DateTime       @default(now())
-  user_questions   UserQuestion[]
-  language         String?
-  invited_by_id    Int?
-  invited_by       User?          @relation("invites", fields: [invited_by_id], references: [id])
-  invited_users    User[]         @relation("invites")
+  id                    Int      @id @default(autoincrement())
+  telegram_chat_id      Int      @unique
+  first_name            String
+  last_name             String?
+  username              String?
+  language              String?
+  is_personal_chat_open Boolean
+  invited_by_id         Int?
+  created_at            DateTime @default(now())
+
+  user_questions UserQuestion[]
+  invited_by     User?          @relation("invites", fields: [invited_by_id], references: [id])
+  invited_users  User[]         @relation("invites")
 }
 
 model EditionType {

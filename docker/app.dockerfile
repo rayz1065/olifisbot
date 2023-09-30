@@ -1,4 +1,4 @@
-FROM node:19
+FROM node:20
 
 WORKDIR /usr/src/app
 
@@ -13,4 +13,3 @@ COPY prisma prisma
 RUN npx prisma generate
 
 COPY . .
-RUN yarn build

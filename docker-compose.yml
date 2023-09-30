@@ -7,48 +7,28 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PW}
     ports:
-      - "5432:5432"
+      - '5432:5432'
     restart: unless-stopped
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
       - bot-network
 
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    restart: unless-stopped
-    volumes:
-      - redisdata:/data
-    networks:
-      - bot-network
-    environment:
-      REDIS_ARGS: --save 20 1
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
-    command:
-      - /bin/sh
-      - -c
-      - redis-server --requirepass "$${REDIS_PASSWORD:?REDIS_PASSWORD is not set}"
-
   app:
     build:
       dockerfile: ./docker/app.dockerfile
     restart: unless-stopped
     volumes:
-      - node_modules:/usr/src/app/node_modules
+      - /usr/src/app/node_modules
       - ./storage:/usr/src/app/storage
     networks:
       - bot-network
     command: npm start
     depends_on:
-      - redis
       - postgres
 
 volumes:
   pgdata:
-  redisdata:
-  node_modules:
 
 networks:
   bot-network:

@@ -1,6 +1,5 @@
 import * as dotenv from 'dotenv';
 import { Bot, Context, InlineKeyboard, session, SessionFlavor } from 'grammy';
-import { sequentialize } from 'grammy-middlewares';
 import { hydrateReply, parseMode, ParseModeFlavor } from '@grammyjs/parse-mode';
 import {
   Conversation,
@@ -12,11 +11,9 @@ import { calendarCallbacks } from './lib/calendar';
 import { PrismaClient, User } from '@prisma/client';
 import { authenticate } from './middlewares/authenticate';
 import { I18n, I18nFlavor } from '@grammyjs/i18n';
-import { emoji } from 'node-emoji';
 import path from 'path';
 import { olifisModule } from './modules/olifis/index';
-import { RedisAdapter } from '@grammyjs/storage-redis';
-import IORedis from 'ioredis';
+import { PrismaAdapter } from '@grammyjs/storage-prisma';
 
 dotenv.config();
 if (!process.env.BOT_TOKEN) {
@@ -48,36 +45,31 @@ export type MyContext = ParseModeFlavor<
 };
 export type MyConversation = Conversation<MyContext>;
 
-const i18n = new I18n<MyContext>({
-  defaultLocale: 'en',
+// set up translations
+export const i18n = new I18n<MyContext>({
+  defaultLocale: process.env.DEFAULT_LOCALE ?? 'it',
   directory: path.join(__dirname, 'i18n'),
   localeNegotiator: (ctx) =>
-    ctx.dbUser?.language ?? ctx.from?.language_code ?? 'en',
+    ctx.dbUser?.language ??
+    ctx.from?.language_code ??
+    process.env.DEFAULT_LOCALE ??
+    'it',
   globalTranslationContext(ctx) {
     return {
-      'emoji-cancel': emoji.x,
-      'emoji-back': emoji.back,
-      'emoji-confirm': emoji.white_check_mark,
       'user-name': escapeHtml(ctx.from?.first_name ?? ''),
     };
   },
 });
 
+// set up db connection and base bot configuration
 export const prisma = new PrismaClient();
-export const redis = new IORedis({
-  host: 'redis',
-  password: process.env.REDIS_PASSWORD,
-});
 export const bot = new Bot<MyContext>(process.env.BOT_TOKEN);
-bot.use(sequentialize());
 bot.use(hydrateReply);
 bot.api.config.use(parseMode('HTML'));
 bot.use(
   session({
     initial: () => ({}),
-    storage: new RedisAdapter({
-      instance: redis,
-    }),
+    storage: new PrismaAdapter(prisma.session),
   })
 );
 
@@ -86,6 +78,7 @@ bot.errorBoundary((err) => {
 });
 
 bot.use(i18n);
+
 bot.use(authenticate);
 
 bot.on('inline_query', async (ctx) => {
@@ -97,7 +90,7 @@ bot.on('inline_query', async (ctx) => {
         photo_file_id: process.env.LOGO_FILE_ID ?? '',
         caption: ctx.t('join-bot'),
         reply_markup: new InlineKeyboard().url(
-          `${ctx.t('enter-bot')} ${emoji.atom_symbol}`,
+          `${ctx.t('enter-bot')} ⚛️`,
           `https://t.me/${ctx.me.username}?start=ref_${ctx.dbUser.id}`
         ),
         parse_mode: 'HTML',
@@ -143,10 +136,6 @@ bot.on('callback_query:data').lazy((ctx) => {
 
 bot.on('callback_query:data', async (ctx) => {
   await ctx.answerCallbackQuery('I did not understand the request');
-});
-
-bot.on('message:text', (ctx) => {
-  console.log('No handler found for message', ctx.message.text);
 });
 
 bot.catch((error) => {

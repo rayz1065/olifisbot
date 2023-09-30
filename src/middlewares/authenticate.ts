@@ -27,6 +27,7 @@ export const authenticate: Middleware<MyContext> = async (ctx, next) => {
         username: ctx.from.username,
         language: ctx.from.language_code,
         invited_by_id: invitedBy?.id,
+        is_personal_chat_open: ctx.chat?.id === ctx.from.id,
       },
     });
   }

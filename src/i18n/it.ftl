@@ -1,14 +1,20 @@
 -bot-name = oliΦsbot
+-schwa = ə
 -bot-creator = @rayz1065
 -problems-website = olifis.it
 -teams-problems-website = gas.olifis.it
 -problems-license-website = https://creativecommons.org/licenses/by-nc/2.0/it/
 -bot-github = https://github.com/rayz1065/olifisbot/
 
-cancel = Annulla {$emoji-cancel}
-back = Indietro {$emoji-back}
-back-to-menu = Torna al menù {$emoji-back}
-confirm = Conferma {$emoji-confirm}
+# base
+
+-emoji-cancel = ❌
+-emoji-back = 🔙
+-emoji-confirm = ✅
+cancel = Annulla {-emoji-cancel}
+back = Indietro {-emoji-back}
+back-to-menu = Torna al menù {-emoji-back}
+confirm = Conferma {-emoji-confirm}
 no-operation-running = Nessuna operazione in corso...
 write-cancel-to-cancel-operation = Scrivi /cancel per annullare
 
