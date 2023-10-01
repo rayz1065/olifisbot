@@ -1,8 +1,8 @@
 import { createConversation } from '@grammyjs/conversations';
-import { Prisma, QuestionTag } from '@prisma/client';
+import { Prisma, QuestionTag, UserQuestion } from '@prisma/client';
 import assert from 'assert';
 import { Parser } from 'expr-eval';
-import { Composer, InlineKeyboard } from 'grammy';
+import { Composer, InlineKeyboard, InputFile } from 'grammy';
 import { emoji } from 'node-emoji';
 import {
   conversationDelete,
@@ -17,12 +17,13 @@ import { QUESTION_TYPES } from './index';
 import queries, { QuestionFull } from './queries';
 import {
   editionQuestions,
-  getQuestionSolutionImage,
-  getQuestionQuestionImage,
+  getQuestionsGroupDirectory,
   mainMenu,
   questionsByTag,
   userQuestionsList,
 } from './user';
+import path from 'path';
+import fs from 'fs';
 
 type EnterQuestionSource = 'rand' | `tag_${number}` | 'profile' | 'edition';
 
@@ -66,6 +67,10 @@ function questionMsg(
         .split('')
         .map((x) => closedAnswer.getBtn(x, question.id, x, source))
     );
+  } else if (question.answer_type === QUESTION_TYPES.selfEvaluation) {
+    keyboard.row(
+      selfEvaluationCb.getBtn(ctx.t('self-evaluate'), question.id, source)
+    );
   } else {
     keyboard.row(
       openAnswer.getBtn(
@@ -100,6 +105,57 @@ function questionMsg(
       ...questionNavigation(ctx, question, source),
     ],
   };
+}
+
+function findImageFile(
+  directory: string,
+  filename: string,
+  extensions = ['png', 'jpg']
+) {
+  for (const extension of extensions) {
+    const filePath = path.join(directory, `${filename}.${extension}`);
+    if (fs.existsSync(filePath)) {
+      return filePath;
+    }
+  }
+}
+
+export function getQuestionQuestionImage(question: QuestionFull) {
+  if (question.question_image) {
+    return question.question_image;
+  }
+  const directory = getQuestionsGroupDirectory(question.questions_group);
+  const filePath = findImageFile(directory, `q-${question.number}`);
+  if (!filePath) {
+    throw new Error(`Question file not found for question ${question.number}`);
+  }
+  return new InputFile(filePath);
+}
+
+export function getQuestionSolutionImage(question: QuestionFull) {
+  if (question.solution_image) {
+    return question.solution_image;
+  }
+  const directory = getQuestionsGroupDirectory(question.questions_group);
+  const filePath = findImageFile(directory, `a-${question.number}`);
+  if (!filePath) {
+    throw new Error(`Solution file not found for question ${question.number}`);
+  }
+  return new InputFile(filePath);
+}
+
+export function getQuestionEvaluationImage(question: QuestionFull) {
+  if (question.evaluation_image) {
+    return question.evaluation_image;
+  }
+  const directory = getQuestionsGroupDirectory(question.questions_group);
+  const filePath = findImageFile(directory, `e-${question.number}`);
+  if (!filePath) {
+    throw new Error(
+      `Evaluation file not found for question ${question.number}`
+    );
+  }
+  return new InputFile(filePath);
 }
 
 async function enterQuestion(
@@ -184,7 +240,8 @@ function prettyPrintAnswer(ctx: MyContext, question: QuestionFull) {
       5
     )} [${question.open_answer_unit ?? ctx.t('adimensional')}]`;
   }
-  return '?';
+
+  return '🖼';
 }
 
 const showSolution = new TgCallback<[questionId: number]>(
@@ -277,6 +334,35 @@ const closedAnswer = new TgCallback<
     });
   }
 
+  const { text, keyboard } = questionSolvedMsg(
+    ctx,
+    question,
+    userQuestion,
+    source
+  );
+  try {
+    await ctx.editMessageMedia({
+      type: 'photo',
+      media: getQuestionSolutionImage(question),
+      caption: text,
+      parse_mode: 'HTML',
+    });
+  } catch (error) {
+    return await ctx.answerCallbackQuery({
+      text: ctx.t('failed-to-send-answer'),
+      show_alert: true,
+    });
+  }
+  await ctx.editMessageReplyMarkup(ik(keyboard));
+  await ctx.answerCallbackQuery(emoji.trophy);
+});
+
+function questionSolvedMsg(
+  ctx: MyContext,
+  question: QuestionFull,
+  userQuestion: UserQuestion,
+  source: EnterQuestionSource
+) {
   const textLines = [
     `<b>${ctx.t('the-solution-is', {
       answer: prettyPrintAnswer(ctx, question),
@@ -287,24 +373,11 @@ const closedAnswer = new TgCallback<
   if (userQuestion.saw_solution) {
     textLines.push(`${emoji.eyes} <i>${ctx.t('you-saw-the-solution')}</i>`);
   }
-  try {
-    await ctx.editMessageMedia({
-      type: 'photo',
-      media: getQuestionSolutionImage(question),
-      caption: textLines.join('\n'),
-      parse_mode: 'HTML',
-    });
-  } catch (error) {
-    return await ctx.answerCallbackQuery({
-      text: ctx.t('failed-to-send-answer'),
-      show_alert: true,
-    });
-  }
-  await ctx.editMessageReplyMarkup(
-    ik(questionNavigation(ctx, question, source))
-  );
-  await ctx.answerCallbackQuery(emoji.trophy);
-});
+  return {
+    text: textLines.join('\n'),
+    keyboard: questionNavigation(ctx, question, source),
+  };
+}
 
 async function olifisOpenAnswer(conversation: MyConversation, ctx: MyContext) {
   const data = ctx.conversationData;
@@ -326,14 +399,14 @@ async function olifisOpenAnswer(conversation: MyConversation, ctx: MyContext) {
     });
   }
 
-  const { text: baseText } = questionMsg(ctx, question, source);
-  const text = `${baseText}\n\n${emoji.question} ${explanation}`;
-  const keyboard = [
+  let { text: baseText } = questionMsg(ctx, question, source);
+  baseText = `${baseText}\n\n${emoji.question} ${explanation}`;
+  const questionKeyboard = [
     [enterQuestionById.getBtn(ctx.t('cancel'), question.id, source)],
   ];
   await ctx.editMessageCaption({
-    caption: text,
-    ...ik(keyboard),
+    caption: baseText,
+    ...ik(questionKeyboard),
     parse_mode: 'HTML',
   });
   const { message } = await conversation.waitFor('message:text');
@@ -349,8 +422,8 @@ async function olifisOpenAnswer(conversation: MyConversation, ctx: MyContext) {
     } catch (error) {
       console.error(error);
       await ctx.editMessageCaption({
-        caption: `${text}\n\n${emoji.warning} ${ctx.t('parse-error')}`,
-        ...ik(keyboard),
+        caption: `${baseText}\n\n${emoji.warning} ${ctx.t('parse-error')}`,
+        ...ik(questionKeyboard),
         parse_mode: 'HTML',
       });
       await conversation.skip({ drop: true });
@@ -359,10 +432,10 @@ async function olifisOpenAnswer(conversation: MyConversation, ctx: MyContext) {
     const userAnswer = parseFloat(message.text);
     if (isNaN(userAnswer)) {
       await ctx.editMessageCaption({
-        caption: `${text}\n\n${emoji.warning} ${ctx.t(
+        caption: `${baseText}\n\n${emoji.warning} ${ctx.t(
           'validation-send-valid-number'
         )}`,
-        ...ik(keyboard),
+        ...ik(questionKeyboard),
         parse_mode: 'HTML',
       });
       await conversation.skip({ drop: true });
@@ -378,42 +451,36 @@ async function olifisOpenAnswer(conversation: MyConversation, ctx: MyContext) {
 
   if (!correct) {
     await ctx.editMessageCaption({
-      caption: `${text}\n\n${ctx.t('is-not-the-right-answer', {
+      caption: `${baseText}\n\n${ctx.t('is-not-the-right-answer', {
         answer: `<code>${escapeHtml(message.text)}</code>`,
       })}`,
-      ...ik(keyboard),
+      ...ik(questionKeyboard),
       parse_mode: 'HTML',
     });
     await conversation.skip({ drop: true });
   }
 
-  const textLines = [
-    `<b>${ctx.t('the-solution-is', {
-      answer: prettyPrintAnswer(ctx, question),
-    })}</b>`,
-    `${emoji.trophy} ` +
-      ctx.t('you-solved-in-attempts', { attempts: userQuestion.attempts }),
-  ];
-  if (userQuestion.saw_solution) {
-    textLines.push(`${emoji.eyes} <i>${ctx.t('you-saw-the-solution')}</i>`);
-  }
+  let { text, keyboard } = questionSolvedMsg(
+    ctx,
+    question,
+    userQuestion,
+    source
+  );
   try {
     await ctx.editMessageMedia({
       type: 'photo',
       media: getQuestionSolutionImage(question),
-      caption: textLines.join('\n'),
+      caption: text,
       parse_mode: 'HTML',
     });
   } catch (error) {
-    textLines.push(ctx.t('failed-to-send-answer'));
+    text = `${text}\n${ctx.t('failed-to-send-answer')}`;
     await ctx.editMessageCaption({
-      caption: textLines.join('\n'),
+      caption: text,
       parse_mode: 'HTML',
     });
   }
-  await ctx.editMessageReplyMarkup(
-    ik(questionNavigation(ctx, question, source))
-  );
+  await ctx.editMessageReplyMarkup(ik(keyboard));
 }
 
 const openAnswer = new TgCallback<
@@ -435,6 +502,91 @@ const openAnswer = new TgCallback<
     source,
   };
   await ctx.conversation.reenter('olifisOpenAnswer');
+});
+
+const selfEvaluationCb = new TgCallback<
+  [questionId: number, source: EnterQuestionSource]
+>('self-eval', async (ctx) => {
+  const [questionId, source] = ctx.callbackParams;
+  const question = await queries.findQuestion({ id: questionId });
+  if (!question) {
+    return await ctx.answerCallbackQuery(ctx.t('question-not-found'));
+  } else if (question.answer_type !== QUESTION_TYPES.selfEvaluation) {
+    return await ctx.answerCallbackQuery(ctx.t('wrong-answer-type'));
+  }
+
+  await ctx.editMessageMedia({
+    type: 'photo',
+    media: getQuestionEvaluationImage(question),
+    caption: ctx.t('attempt-answer-evaluation-explanation'),
+    parse_mode: 'HTML',
+    has_spoiler: true,
+  });
+  await ctx.editMessageReplyMarkup(
+    ik([
+      [
+        selfEvaluationMarkCb.getBtn(
+          ctx.t('mark-solved'),
+          question.id,
+          source,
+          true
+        ),
+        selfEvaluationMarkCb.getBtn(
+          ctx.t('add-error'),
+          question.id,
+          source,
+          false
+        ),
+      ],
+      [enterQuestionById.getBtn(ctx.t('cancel'), question.id, source)],
+    ])
+  );
+});
+
+const selfEvaluationMarkCb = new TgCallback<
+  [questionId: number, source: EnterQuestionSource, isCorrect: boolean]
+>('self-eval-mark', async (ctx) => {
+  const [questionId, source, isCorrect] = ctx.callbackParams;
+  const question = await queries.findQuestion({ id: questionId });
+  if (!question) {
+    return await ctx.answerCallbackQuery(ctx.t('question-not-found'));
+  } else if (question.answer_type !== QUESTION_TYPES.selfEvaluation) {
+    return await ctx.answerCallbackQuery(ctx.t('wrong-answer-type'));
+  }
+
+  const userQuestion = await updateUserQuestion(
+    ctx.dbUser.id,
+    questionId,
+    isCorrect
+  );
+  if (!isCorrect) {
+    return await ctx.answerCallbackQuery({
+      text: ctx.t('error-added'),
+      show_alert: true,
+    });
+  }
+
+  const { text, keyboard } = questionSolvedMsg(
+    ctx,
+    question,
+    userQuestion,
+    source
+  );
+  try {
+    await ctx.editMessageMedia({
+      type: 'photo',
+      media: getQuestionSolutionImage(question),
+      caption: text,
+      parse_mode: 'HTML',
+    });
+  } catch (error) {
+    return await ctx.answerCallbackQuery({
+      text: ctx.t('failed-to-send-answer'),
+      show_alert: true,
+    });
+  }
+  await ctx.editMessageReplyMarkup(ik(keyboard));
+  await ctx.answerCallbackQuery(emoji.trophy);
 });
 
 function questionNavigation(
@@ -475,6 +627,8 @@ const callbacks = [
   showSolution,
   hideSolution,
   randomQuestion,
+  selfEvaluationCb,
+  selfEvaluationMarkCb,
   enterQuestionById,
   openAnswer,
 ].map((x) => x.setPrefix('olifis-q'));

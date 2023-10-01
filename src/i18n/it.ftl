@@ -102,12 +102,13 @@ olifis-config-questions-group-not-found = Gruppo di domande non trovato
 olifis-config-change-group-title = Cambia titolo del gruppo di domande
 olifis-config-open-answer = Risposta aperta
 olifis-config-choose-answer-or-type =
-    Scegli una delle risposte o invia una risposta aperta in uno dei seguenti formati:
-    ➡️ &lt;min&gt; &lt;max&gt; [&lt;unità&gt], e.g.: "9.6 10 m/s^2", "99 101"
-    ➡️ &lt;valore&gt; &lt;errore&gt% [&lt;unità&gt;], "50 1% km^2", "1000 5%".
+    <b>Risposta chiusa</b>: scegli una delle risposte
+    <b>Risposta aperta</b>: scrivi la risposta in uno dei seguenti formati,
+    ➡️ <code>&lt;min&gt; &lt;max&gt; [&lt;unità&gt]</code>, e.g.: "<code>9.6 10 m/s^2</code>", "<code>99 101</code>";
+    ➡️ <code>&lt;valore&gt; &lt;errore&gt% [&lt;unità&gt;]</code>, "<code>50 1% km^2</code>", "<code>1000 5%</code>".
 
-    Invia una riga che inizia con '<code>=</code>' se le soluzione è una formula, e.g. "= G*M*m / (r^2)"
-# Invia una riga che inizia con '<code>?</code>' se la soluzione è da scegliere tra delle opzioni, e.g. "?Stabile,Instabile" o "? α &lt; 0, α ≥ 0"
+    <b>Formula</b>: invia una riga che inizia con '<code>=</code>', e.g. "<code>= G*M*m / (r^2)</code>"
+    🖼 <b>Autovalutazione</b> Invia un'immagine se la soluzione è di tipo autovalutazione
 olifis-config-question-created = La domanda è stata creata
 
 adimensional = Adimensionale
@@ -141,6 +142,13 @@ attempt-answer-formula-explanation =
     Esplicita sempre tutte le operazioni, usa le parentesi in caso di dubbio.
 attempt-answer-open-explanation =
     Manda come risposta solo un solo numero, la soluzione in [{ $unit }]
+self-evaluate = Autovaluta ✏️
+attempt-answer-evaluation-explanation =
+    Controlla se la tua risposta corrisponde all'immagine
+    <i>Se la tua risposta è sbagliata e vuoi tener traccia del tuo progresso premi {add-error}</i>
+mark-solved = Quesito risolto ✅
+add-error = Aggiungi errore 😞
+error-added = Errore segnato ❌
 
 choose-an-edition-to-see-questions = Scegli una delle edizioni per vedere la lista delle domande
 choose-a-question-from-the-list = Scegli una delle domande tra quelle disponibili

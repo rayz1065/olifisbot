@@ -5,7 +5,7 @@ import {
   UserQuestion,
 } from '@prisma/client';
 import assert from 'assert';
-import { Composer, InputFile } from 'grammy';
+import { Composer } from 'grammy';
 import { emoji } from 'node-emoji';
 import path from 'path';
 import { tgButtonsGrid, tgPaginated } from '../../lib/list';
@@ -23,11 +23,7 @@ import {
   EDITION_TYPES,
   QUESTIONS_PAGE_SIZE,
 } from './index';
-import queries, {
-  EditionFull,
-  QuestionFull,
-  QuestionWithTags,
-} from './queries';
+import queries, { EditionFull, QuestionWithTags } from './queries';
 import { enterQuestionById, randomQuestion } from './question';
 
 export const olifisUserModule = new Composer<MyContext>();
@@ -496,30 +492,6 @@ export function getQuestionsGroupDirectory(
     `${questionsGroup.edition.type.code}`,
     `${questionsGroup.edition.year}`,
     `${questionsGroup.code}`
-  );
-}
-
-export function getQuestionQuestionImage(question: QuestionFull) {
-  if (question.question_image) {
-    return question.question_image;
-  }
-  return new InputFile(
-    path.join(
-      getQuestionsGroupDirectory(question.questions_group),
-      `q-${question.number}.jpg`
-    )
-  );
-}
-
-export function getQuestionSolutionImage(question: QuestionFull) {
-  if (question.solution_image) {
-    return question.solution_image;
-  }
-  return new InputFile(
-    path.join(
-      getQuestionsGroupDirectory(question.questions_group),
-      `a-${question.number}.jpg`
-    )
   );
 }
 

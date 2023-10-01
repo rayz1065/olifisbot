@@ -102,12 +102,13 @@ olifis-config-questions-group-not-found = Questions group not found
 olifis-config-change-group-title = Change group title
 olifis-config-open-answer = Open answer
 olifis-config-choose-answer-or-type =
-    Choose one of the answers or write an open question in one of the following formats:
-    ➡️ &lt;min&gt; &lt;max&gt; [&lt;unit&gt], e.g.: "9.6 10 m/s^2", "99 101"
-    ➡️ &lt;value&gt; &lt;error&gt% [&lt;unit&gt;], "50 1% km^2", "1000 5%".
+    <b>Closed answer</b>: choose between the available ones
+    <b>Open answer</b>: write the answer in one of the following formats,
+    ➡️ <code>&lt;min&gt; &lt;max&gt; [&lt;unit&gt]</code>, e.g.: "<code>9.6 10 m/s^2</code>", "<code>99 101</code>";
+    ➡️ <code>&lt;value&gt; &lt;error&gt% [&lt;unit&gt;]</code>, "<code>50 1% km^2</code>", "<code>1000 5%</code>".
 
-    Send a line that starts with '<code>=</code>' if the solution is a formula, e.g. "= G*M*m / (r^2)"
-# Send a line that starts with '<code>?</code>' if the solution must be chosen from some alternatives, e.g. "?Stable,Unstable" o "? α &lt; 0, α ≥ 0"
+    <b>Formula</b>: send a line starting with '<code>=</code>', e.g. "<code>= G*M*m / (r^2)</code>"
+    🖼 <b>Self evaluation</b> send an image if the solution is of type self evaluation
 olifis-config-question-created = The question was created
 
 adimensional = Adimensional
@@ -141,6 +142,13 @@ attempt-answer-formula-explanation =
     Always explicit all the operations, use parenthesis when in doubt.
 attempt-answer-open-explanation =
     Send as reply just one number, the solution in [{ $unit }]
+self-evaluate = Self evaluate ✏️
+attempt-answer-evaluation-explanation =
+    Check if your answer corresponds to the image
+    <i>If your answer is wrong and you want to keep track of your progress, press {add-error}</i>
+mark-solved = Question solved ✅
+add-error = Add error 😞
+error-added = Error added ❌
 
 choose-an-edition-to-see-questions = Choose one of the editions to get the list of the questions
 choose-a-question-from-the-list = Choose one of the questions from the ones available

@@ -68,6 +68,8 @@ function createQuestionMsg(
     const expression = Parser.parse(formula);
     const vars = expression.variables();
     answerTxt = `${expression} ${ctx.t('with-variables')} ${vars.join(', ')}`;
+  } else if (questionData.answer_type === QUESTION_TYPES.selfEvaluation) {
+    answerTxt = '🖼';
   }
   const text =
     `<b>${ctx.t('olifis-config-creating-question-for', {
@@ -138,19 +140,24 @@ async function answerInput(
       answer_type: typeof QUESTION_TYPES.formula;
       answer_formula: string;
     }
+  | {
+      answer_type: typeof QUESTION_TYPES.selfEvaluation;
+      evaluation_image: string;
+    }
 > {
   const answers = new InlineKeyboard();
   const possibleAnswers = 'ABCDE'.split('');
+  answers.row();
   possibleAnswers.forEach((answer) => {
     answers.add(answerDummy.getBtn(answer, 'closed', answer));
   });
-  answers.row();
   let { text, keyboard } = getMessage();
   keyboard = [...answers.inline_keyboard, ...keyboard];
   await conversationEdit(ctx, text, ik(keyboard));
   const { message, callbackQuery } = await conversation.waitFor([
     'callback_query:data',
     'message:text',
+    'message:photo',
   ]);
   if (callbackQuery) {
     const callbackData = callbackQuery.data;
@@ -175,6 +182,14 @@ async function answerInput(
   }
   await skipCommands(conversation, message);
   await conversationDelete(ctx, message.message_id);
+
+  if (message.photo) {
+    return {
+      answer_type: 'self-eval',
+      evaluation_image: message.photo.at(-1)!.file_id,
+    };
+  }
+  assert(message.text);
 
   if (message.text.startsWith('=')) {
     const formula = message.text.split('=', 2)[1];

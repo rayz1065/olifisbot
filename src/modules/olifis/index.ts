@@ -20,7 +20,8 @@ export const QUESTION_TYPES = {
   closed: 'closed',
   open: 'open',
   formula: 'formula',
-};
+  selfEvaluation: 'self-eval',
+} as const;
 export type QuestionType =
   | typeof QUESTION_TYPES.closed
   | typeof QUESTION_TYPES.open

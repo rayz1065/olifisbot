@@ -76,6 +76,7 @@ model Question {
   number             Int
   question_image     String?
   solution_image     String?
+  evaluation_image   String?
   answer_type        String
   closed_answer      String?
   answer_hint        String?
