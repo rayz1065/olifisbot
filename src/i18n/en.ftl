@@ -1,6 +1,7 @@
 -bot-name = oliΦsbot
 -bot-creator = @rayz1065
 -problems-website = olifis.it
+-news-channel = @olifisnews
 -teams-problems-website = gas.olifis.it
 -problems-license-website = https://creativecommons.org/licenses/by-nc/2.0/
 -bot-github = https://github.com/rayz1065/olifisbot/
@@ -16,6 +17,38 @@ back-to-menu = Back to menu {-emoji-back}
 confirm = Confirm {-emoji-confirm}
 no-operation-running = No operation is running...
 write-cancel-to-cancel-operation = Write /cancel to cancel operation
+
+# bot names and descriptions
+bot-name = Physics Olympiads ⚛️
+bot-short-description = Navigate through the problems from the physics Olympiads!
+    🧑‍💻 Dev: {-bot-creator}
+    📢 {-news-channel}
+bot-description =
+    Navigate through the problems from the physics Olympiads of every level, more than a thousand problems are waiting for you!
+    🎲 Solve a random question
+    🔥 Search based on topic
+    📰 Access to all the old editions
+    👤 Keep track of your progress
+
+    👨‍💻 Dev: {-bot-creator}
+    📢 News: {-news-channel}
+    📦 GitHub: {-bot-github}
+    📃 The problems are available on their respective websites and released under license CC-BY-NC
+
+bot-info-msg =
+    📖 <b>Information about {-bot-name}</b>
+    👨‍💻 This bot was created by {-bot-creator}.
+    📢 News: {-news-channel}
+
+    🔗 Problems from <i>physics Olympiads</i> can be found online on the website {-problems-website}.
+    🧲 Problems of the <i>teams championship</i> can be found on {-teams-problems-website}.
+
+    📃 All problems are available under the <b>license</b> CC BY-NC, download a copy of it on {-problems-license-website}.
+
+    📦 The <b>source code</b> of {-bot-name} is on GitHub at {-bot-github}.
+    🛠 Written in Typescript with the framework <a href="https://grammy.dev/">grammy</a>
+start-cmd-help = Start the bot
+
 
 and = And
 type = Type
@@ -83,6 +116,7 @@ invalid-open-answer-format = Format not valid, please two numbers and a unit
 invalid-error = Indicated error not valid
 with-variables = with variables
 parse-error = Error reading the formula
+self-evaluation = Self evaluation
 
 welcome-to-olifis-bot = Welcome {$user-name} to {-bot-name}!
 no-random-question-found = No random question found!
@@ -138,17 +172,6 @@ attempted-questions = Attempted questions
 
 formatted-date-short = {DATETIME($date, month: "short", year: "numeric", day: "numeric")}
 formatted-date-long = {DATETIME($date, month: "long", year: "numeric", day: "numeric", weekday: "long")}
-
-bot-info-msg =
-    📖 <b>Information about {-bot-name}</b>
-    👨‍💻 This bot was created by {-bot-creator}.
-
-    🔗 Problems from <i>physics Olympiads</i> can be found online on the website {-problems-website}.
-    🧲 Problems of the <i>teams championship</i> can be found on {-teams-problems-website}.
-
-    📃 All problems are available under the <b>license</b> CC BY-NC, download a copy of it on {-problems-license-website}.
-
-    📦 The <b>source code</b> of {-bot-name} is on GitHub at {-bot-github}.
 
 welcome-msg =
     Welcome {$user-name} on <b>{-bot-name}</b>, unofficial bot to train for the physics Olympiads!

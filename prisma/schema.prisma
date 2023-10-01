@@ -18,7 +18,7 @@ model Session {
 
 model User {
   id                    Int      @id @default(autoincrement())
-  telegram_chat_id      Int      @unique
+  telegram_chat_id      BigInt   @unique
   first_name            String
   last_name             String?
   username              String?

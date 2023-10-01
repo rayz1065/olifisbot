@@ -49,6 +49,9 @@ export type MyConversation = Conversation<MyContext>;
 export const i18n = new I18n<MyContext>({
   defaultLocale: process.env.DEFAULT_LOCALE ?? 'it',
   directory: path.join(__dirname, 'i18n'),
+  fluentBundleOptions: {
+    useIsolating: false,
+  },
   localeNegotiator: (ctx) =>
     ctx.dbUser?.language ??
     ctx.from?.language_code ??

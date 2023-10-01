@@ -1,6 +1,7 @@
 -bot-name = oliΦsbot
 -schwa = ə
 -bot-creator = @rayz1065
+-news-channel = @olifisnews
 -problems-website = olifis.it
 -teams-problems-website = gas.olifis.it
 -problems-license-website = https://creativecommons.org/licenses/by-nc/2.0/it/
@@ -17,6 +18,37 @@ back-to-menu = Torna al menù {-emoji-back}
 confirm = Conferma {-emoji-confirm}
 no-operation-running = Nessuna operazione in corso...
 write-cancel-to-cancel-operation = Scrivi /cancel per annullare
+
+# bot names and descriptions
+bot-name = Olimpiadi di fisica ⚛️
+bot-short-description = Naviga tra i quesiti delle olimpiadi di fisica!
+    🧑‍💻 Dev: {-bot-creator}
+    📢 {-news-channel}
+bot-description =
+    Naviga tra i quesiti delle olimpiadi di fisica di ogni livello, più di mille quesiti ti aspettano!
+    🎲 Risolvi un quesito casuale
+    🔥 Cerca in base all'argomento
+    📰 Accedi a tutte le vecchie edizioni
+    👤 Traccia il tuo progresso
+
+    👨‍💻 Dev: {-bot-creator}
+    📢 Notizie: {-news-channel}
+    📦 GitHub: {-bot-github}
+    📃 I problemi sono disponibili sui rispettivi siti e rilasciati sotto licenza CC BY-NC.
+bot-info-msg =
+    📖 <b>Informazioni su {-bot-name}</b>
+    👨‍💻 Questo bot è stato creato da {-bot-creator}.
+    📢 Notizie: {-news-channel}
+
+    🔗 I problemi delle <i>olimpiadi di fisica</i> possono essere trovati online sul sito {-problems-website}.
+    🧲 I problemi dei <i>campionati a squadre</i> si possono trovare su {-teams-problems-website}.
+
+    📃 Tutti i problemi sono disponibili sotto <b>licenza</b> CC BY-NC, ne puoi scaricare una copia su {-problems-license-website}.
+
+    📦 Il <b>codice sorgente</b> di {-bot-name} si trova su GitHub a {-bot-github}.
+    🛠 Scritto in Typescript con il framework <a href="https://grammy.dev/">grammy</a>
+start-cmd-help = Avvia il bot
+
 
 and = e
 type = Tipo
@@ -35,7 +67,7 @@ failed-to-get-question = Non sono riuscito a inviare la domanda
 failed-to-send-answer = Non sono riuscito ad inviare la soluzione
 
 admin-config = Configura Bot
-olifis-config-title = Benvenut* nelle impostazioni del bot!
+olifis-config-title = Benvenut{-schwa} nelle impostazioni del bot!
 olifis-config-manage-editions = Gestisci edizioni
 olifis-config-manage-users = Gestisci utenti
 olifis-config-config = Config
@@ -84,8 +116,9 @@ invalid-open-answer-format = Formato non valido, indica due numeri e un'unità d
 invalid-error = Errore inserito non valido
 with-variables = con variabili
 parse-error = Errore nel leggere la formula
+self-evaluation = Autovalutazione
 
-welcome-to-olifis-bot = Benvenut* {$user-name} in {-bot-name}!
+welcome-to-olifis-bot = Benvenut{-schwa} {$user-name} in {-bot-name}!
 no-random-question-found = Non ho trovato una domanda casuale!
 main-menu = Menù principale
 random-question = Domanda casuale
@@ -140,26 +173,15 @@ attempted-questions = Domande provate
 formatted-date-short = {DATETIME($date, month: "short", year: "numeric", day: "numeric")}
 formatted-date-long = {DATETIME($date, month: "long", year: "numeric", day: "numeric", weekday: "long")}
 
-bot-info-msg =
-    📖 <b>Informazioni su {-bot-name}</b>
-    👨‍💻 Questo bot è stato creato da {-bot-creator}.
-
-    🔗 I problemi delle <i>olimpiadi di fisica</i> possono essere trovati online sul sito {-problems-website}.
-    🧲 I problemi dei <i>campionati a squadre</i> si possono trovare su {-teams-problems-website}.
-
-    📃 Tutti i problemi sono disponibili sotto <b>licenza</b> CC BY-NC, ne puoi scaricare una copia su {-problems-license-website}.
-
-    📦 Il <b>codice sorgente</b> di {-bot-name} si trova su GitHub a {-bot-github}.
-
 welcome-msg =
-    Benvenut* {$user-name} su <b>{-bot-name}</b>, bot non ufficiale per allenarti per le olimpiadi di fisica!
+    Benvenut{-schwa} {$user-name} su <b>{-bot-name}</b>, bot non ufficiale per allenarti per le olimpiadi di fisica!
 
     ❓ Con questo bot potrai trovare i quesiti e le risposte delle varie gare delle olimpiadi di fisica.
     🎲 Puoi iniziare da un quesito casuale
     📰 Cercare quello che ti interessa tra le varie edizioni passate
     ⚛️ O cercarne uno in base all'argomento
 
-    🆘 Se hai problemi con il bot, hai trovato un errore, vuoi aiutarmi a taggare i problemi o lasciarmi del feedback, sentiti liber* di contattarmi!
+    🆘 Se hai problemi con il bot, hai trovato un errore, vuoi aiutarmi a taggare i problemi o lasciarmi del feedback, sentiti liber{-schwa} di contattarmi!
 
 info-and-stats = Informazioni e statistiche su {-bot-name}
 bot-created-on = Bot creato il
