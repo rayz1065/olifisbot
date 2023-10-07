@@ -15,7 +15,7 @@ import {
   TgCallback,
   tgCallbackMiddleware,
 } from '../../lib/utils';
-import { MyContext } from '../../main';
+import { MyContext, prisma } from '../../main';
 import { isAdmin } from '../../middlewares/is-admin';
 import { adminConfig } from './admin';
 import {
@@ -25,10 +25,36 @@ import {
 } from './index';
 import queries, { EditionFull, QuestionWithTags } from './queries';
 import { enterQuestionById, randomQuestion } from './question';
+import { TranslationContext } from '@grammyjs/i18n/types/src/deps';
 
 export const olifisUserModule = new Composer<MyContext>();
 
-function mainMenuMsg(ctx: MyContext) {
+export async function getRandomSplash(ctx: MyContext) {
+  const news: Record<string, Record<string, () => Promise<string>>> = {
+    'join-news-channel': {},
+    'view-source-code': {},
+    'bot-completely-rewritten': {},
+    'now-with-more-championships': {},
+    'contains-problems-count': {
+      problemsCount: async () => `${await prisma.question.count()}`,
+    },
+  };
+
+  const newsKeys = Object.keys(news);
+  const newsKey = newsKeys[Math.floor(Math.random() * newsKeys.length)];
+  const newsVariables = news[newsKey];
+  const variables: TranslationContext = {};
+  for (const variableKey in news[newsKey]) {
+    if (Object.prototype.hasOwnProperty.call(newsVariables, variableKey)) {
+      const callable = newsVariables[variableKey];
+      variables[variableKey] = await callable();
+    }
+  }
+
+  return ctx.t(newsKey, variables);
+}
+
+async function mainMenuMsg(ctx: MyContext) {
   let infoButton = botInfo.getBtn(`${ctx.t('info')} ${emoji.book}`);
   if (ctx.session.mainMenuInfoButton === 'stats') {
     infoButton = botStats.getBtn(`${ctx.t('stats')} ${emoji.bar_chart}`);
@@ -55,23 +81,28 @@ function mainMenuMsg(ctx: MyContext) {
       adminConfig.getBtn(`${ctx.t('admin-config')} ${emoji.wrench}`),
     ]);
   }
-  return { text: `${emoji.wave} ${ctx.t('welcome-msg')}`, keyboard };
+
+  const splash = await getRandomSplash(ctx);
+  return {
+    text: `${emoji.wave} ${ctx.t('welcome-msg')}\n<i>${splash}</i>`,
+    other: { ...ik(keyboard), disable_web_page_preview: true },
+  };
 }
 
 olifisUserModule.command('start', async (ctx) => {
-  const { text, keyboard } = mainMenuMsg(ctx);
-  await ctx.reply(text, ik(keyboard));
+  const { text, other } = await mainMenuMsg(ctx);
+  await ctx.reply(text, other);
 });
 
 export const mainMenu = new TgCallback('menu', async (ctx) => {
-  const { text, keyboard } = mainMenuMsg(ctx);
-  await ctx.answerCallbackQuery(ctx.t('main-menu'));
+  const { text, other } = await mainMenuMsg(ctx);
   if (ctx.callbackQuery.message?.photo) {
-    await ctx.reply(text, ik(keyboard));
+    await ctx.reply(text, other);
     await ctx.deleteMessage();
   } else {
-    await ctx.editMessageText(text, ik(keyboard));
+    await ctx.editMessageText(text, other);
   }
+  await ctx.answerCallbackQuery(ctx.t('main-menu'));
 });
 
 function getLanguages() {

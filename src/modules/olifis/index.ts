@@ -3,7 +3,7 @@ import { MyContext } from '../../main';
 import { isAdmin } from '../../middlewares/is-admin';
 import { olifisAdminModule } from './admin';
 import { olifisQuestionModule } from './question';
-import { olifisUserModule } from './user';
+import { getRandomSplash, olifisUserModule } from './user';
 
 export const olifisModule = new Composer<MyContext>();
 
@@ -30,3 +30,11 @@ export type QuestionType =
 olifisModule.filter(isAdmin).use(olifisAdminModule);
 olifisModule.use(olifisUserModule);
 olifisModule.use(olifisQuestionModule);
+
+// fallback
+olifisModule.chatType('private').on('message:text', async (ctx) => {
+  const splash = await getRandomSplash(ctx);
+  await ctx.reply(`${splash}\n${ctx.t('write-start-to-open-menu')}`, {
+    reply_markup: { remove_keyboard: true },
+  });
+});

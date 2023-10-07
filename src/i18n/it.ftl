@@ -49,6 +49,14 @@ bot-info-msg =
     🛠 Scritto in Typescript con il framework <a href="https://grammy.dev/">grammy</a>
 start-cmd-help = Avvia il bot
 
+# spash messages
+
+join-news-channel = 📢 Entra in {-news-channel} per tutte le novità
+view-source-code = 📦 Il codice sorgente è disponibile su {-bot-github}
+bot-completely-rewritten = 👨‍💻 Il bot è stato completamente riscritto, lasciami un feedback {-bot-creator}
+now-with-more-championships = 🧲 Contiene il 400% di campionati in più
+contains-problems-count = 📖 Ci sono attualmente <b>{$problemsCount}</b> problemi
+write-start-to-open-menu = Scrivi /start per aprire il menù principale
 
 and = e
 type = Tipo
