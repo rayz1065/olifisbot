@@ -31,7 +31,7 @@ export function decodeDeepLinkParams(encodedParams: string) {
 }
 
 /**
- * Creates a depp-link url with encoded params
+ * Creates a deep-link url with encoded params
  */
 export function encodeDeepLinkUrl(me: User, params: (string | number)[]) {
   const baseUrl = `https://t.me/${me.username}`;
